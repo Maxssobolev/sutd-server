@@ -12,6 +12,8 @@ app.use(
   cors({
     origin: [
       'http://localhost:3001',
+      'https://sutd-client.vercel.app',
+      'https://sutd-client-nhjwz95ic-maxssobolev.vercel.app',
       '*'
     ],
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
