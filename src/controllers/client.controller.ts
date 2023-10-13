@@ -7,7 +7,7 @@ class ClientController {
 
   getAllUsers = async (req: Request, res: Response, next: NextFunction) => {
     return await this.pluginService
-      .getAllUsers()
+      .getAllUsers(Number(req.query.page), Number(req.query.limit), req.query.search as string)
       .then(resp => res.json(resp))
       .catch(err => next(ApiError.badRequest(err)));
   };
