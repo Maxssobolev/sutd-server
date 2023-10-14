@@ -11,7 +11,7 @@ export class ClientService {
                      c.fio AS fio,
                      c.dob,
                      c.phone,
-                     MAX(o."createdAt") AS last_order_date,
+                     MAX(o.createdAt) AS last_order_date,
                      CASE
                          WHEN p.abonementId IS NOT NULL THEN 'Есть абонемент'
                          ELSE 'Нет абонемента'
@@ -45,7 +45,7 @@ export class ClientService {
                     SELECT
                         c.clientId,
                         c.fio AS client_name,
-                        MAX(o."createdAt") AS last_order_date,
+                        MAX(o.createdAt) AS last_order_date,
                         CASE
                             WHEN p.abonementId IS NOT NULL THEN 'Есть абонемент'
                             ELSE 'Нет абонемента'
