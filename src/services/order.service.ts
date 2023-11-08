@@ -9,32 +9,34 @@ export class OrderService {
                 db.query(`
                 WITH Orders AS (
                  SELECT
-                     o.clientId as id,
-                     o.orderId AS orderid,
-                     o.mentorId AS mentorid,
-                     o.notes,
-                     o.status,
-                     o.createdat,
+                     o.clientid as order_client_id,
+                     o.orderid AS order_id,
+                     o.mentorid AS order_mentor_id,
+                     o.notes AS order_notes,
+                     o.status as order_status,
+                     o.createdat as order_createdat,
                      m.fio AS mentor_name,
-                     c.fio AS client_name
+                     c.fio AS client_fio,
+                     c.clientid AS client_id
                  FROM Orders o
-                 LEFT JOIN Clients c ON o.clientId = c.clientId
-                 LEFT JOIN Mentors m ON o.mentorId = m.mentorId
+                 LEFT JOIN Clients c ON o.clientid = c.clientid
+                 LEFT JOIN Mentors m ON o.mentorid = m.mentorid
                  WHERE c.fio LIKE '%${search}%'  
                  )
                  SELECT
-                    id,
-                    orderid,
-                    mentorid,
-                    notes,
-                    status,
-                    createdat,
-                    mentor_name,
-                    client_name
+                 order_client_id,
+                 order_id,
+                 order_mentor_id,
+                 order_notes,
+                 order_status,
+                 order_createdat,
+                 mentor_name,
+                 client_fio,
+                 client_id
                  FROM (
                      SELECT
                          *,
-                         ROW_NUMBER() OVER (ORDER BY createdat DESC) AS row_num
+                         ROW_NUMBER() OVER (ORDER BY order_createdat DESC) AS row_num
                      FROM Orders
                  ) AS PaginatedData
                  WHERE row_num BETWEEN ${page} * ${limit} + 1 AND (${page} + 1) * ${limit}
@@ -42,17 +44,17 @@ export class OrderService {
                 db.query(`
                 WITH Orders AS (
                     SELECT
-                        o.clientId as id,
-                        o.orderId AS orderid,
-                        o.mentorId AS mentorid,
+                        o.clientid as id,
+                        o.orderid AS orderid,
+                        o.mentorid AS mentorid,
                         o.notes,
                         o.status,
                         o.createdat,
                         m.fio AS mentor_name,
-                        c.fio AS client_name
+                        c.fio AS client_fio
                     FROM Orders o
-                    LEFT JOIN Clients c ON o.clientId = c.clientId
-                    LEFT JOIN Mentors m ON o.mentorId = m.mentorId
+                    LEFT JOIN Clients c ON o.clientid = c.clientid
+                    LEFT JOIN Mentors m ON o.mentorid = m.mentorid
                     WHERE c.fio LIKE '%${search}%'
                     
                 )
@@ -67,7 +69,7 @@ export class OrderService {
         }
         catch (e) {
             console.log(e)
-            throw 'Error fetching clients'
+            throw 'Error fetching orders'
         }
     }
   

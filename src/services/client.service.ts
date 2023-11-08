@@ -1,3 +1,4 @@
+import { ClientUpdateDto } from '../shared/types';
 import db from '../db';
 
 export class ClientService {
@@ -117,6 +118,39 @@ export class ClientService {
         catch (e) {
             console.log(e)
             throw 'Error fetching client'
+        }
+    }
+
+    async update (dto: ClientUpdateDto) {
+        try {
+            const sql = `
+                UPDATE Clients
+                SET
+                fio = '${dto.client_fio}',
+                dob = '${dto.client_dob}',
+                phone = '${dto.client_phone}',
+                mentorid = ${dto.mentor_id}
+                WHERE 
+                clientid = ${dto.client_id};
+            `
+            const sql2 = (dto.abonement_id && dto.abonement_id != dto.purchase_abonement_id) ? `
+                UPDATE Purchases
+                SET
+                abonementid = ${dto.abonement_id},
+                paymentmethod = '${dto.purchase_paymentmethod}',
+                ispaid = false,
+                startdate = '${dto.purchase_startdate}',
+                enddate = '${dto.purchase_enddate}'
+                WHERE clientid = ${dto.client_id};
+            ` : ''
+
+            const [[result], _] = await db.query(sql + sql2);
+
+            return result;
+        }
+        catch (e) {
+            console.log(e)
+            throw 'Error update client info'
         }
     }
   

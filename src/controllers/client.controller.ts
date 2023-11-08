@@ -20,6 +20,13 @@ class ClientController {
       .catch(err => next(ApiError.badRequest(err)));
   };
 
+  update = async (req: Request, res: Response, next: NextFunction) => {
+    return await this.clientService
+      .update(req.body)
+      .then(resp => res.json(resp))
+      .catch(err => next(ApiError.badRequest(err)));
+  };
+
   
 }
 
