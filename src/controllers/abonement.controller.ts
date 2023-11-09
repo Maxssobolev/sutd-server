@@ -8,7 +8,7 @@ class AbonementController {
 
   getAll = async (req: Request, res: Response, next: NextFunction) => {
     return await this.mentorService
-      .getAll(Number(req.query.page), Number(req.query.limit), req.query.search as string)
+      .getAll(Number(req.query.page), Number(req.query.limit), req.query.search as string, req.query.sortmodel)
       .then(resp => res.json(resp))
       .catch(err => next(ApiError.badRequest(err)));
   };

@@ -6,5 +6,6 @@ const clientRouter = Router();
 clientRouter.get('', clientController.getAllUsers)
 clientRouter.get('/:id', clientController.getOneUser)
 clientRouter.put('/:id', clientController.update)
+clientRouter.post('', clientController.create)
 
 export { clientRouter };

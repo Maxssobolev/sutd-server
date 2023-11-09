@@ -3,7 +3,10 @@ import db from '../db';
 
 export class ClientService {
 
-    async getAllUsers(page = 1, limit = 10, search = "") {
+    async getAllUsers(page = 1, limit = 10, search = "", order: any) {
+        //myOrder: {"sortModel":[{"field":"client_fio","sort":"desc"}]} || ''
+        const myOrder = JSON.parse(order)
+        const hasOrder = !!myOrder && myOrder?.sortModel?.at(0)
         try {
 
             const [[rows], [[count]]] = await Promise.all([
@@ -25,7 +28,7 @@ export class ClientService {
                  LEFT JOIN Orders o ON c.clientId = o.clientId
                  LEFT JOIN Purchases p ON c.clientId = p.clientId
                  LEFT JOIN Mentors m ON c.mentorId = m.mentorId
-                 WHERE c.fio LIKE '%${search}%'  
+                 WHERE c.fio ILIKE '%${search}%'  
                  GROUP BY c.clientId, c.fio, m.fio, p.abonementId, c.dob, c.phone
                  )
                  SELECT
@@ -40,7 +43,7 @@ export class ClientService {
                  FROM (
                      SELECT
                          *,
-                         ROW_NUMBER() OVER (ORDER BY last_order_date DESC) AS row_num
+                         ROW_NUMBER() OVER (ORDER BY ${hasOrder ? `${myOrder.sortModel?.at(0).field} ${myOrder.sortModel?.at(0).sort}` : 'last_order_date DESC'}) AS row_num
                      FROM ClientOrders
                  ) AS PaginatedData
                  WHERE row_num BETWEEN ${page} * ${limit} + 1 AND (${page} + 1) * ${limit}
@@ -60,7 +63,7 @@ export class ClientService {
                     LEFT JOIN Orders o ON c.clientId = o.clientId
                     LEFT JOIN Purchases p ON c.clientId = p.clientId
                     LEFT JOIN Mentors m ON c.mentorId = m.mentorId
-                    WHERE c.fio LIKE '%${search}%'
+                    WHERE c.fio ILIKE '%${search}%'
                     GROUP BY c.clientId, c.fio, m.fio, p.abonementId
                 )
                 SELECT COUNT(*) AS total_count
@@ -104,13 +107,13 @@ export class ClientService {
             FROM 
                 Clients
             LEFT JOIN
-                Purchases ON Clients.clientId = Purchases.clientId
+                Purchases ON Clients.clientid = Purchases.clientid
             LEFT JOIN
-                Abonements ON Purchases.abonementId = Abonements.abonementId
+                Abonements ON Purchases.abonementid = Abonements.abonementid
             LEFT JOIN
-                Mentors ON Clients.mentorId = Mentors.mentorId
+                Mentors ON Clients.mentorid = Mentors.mentorid
             WHERE
-                Clients.clientId = ${id};
+                Clients.clientid = ${id};
            `);
            
            return result
@@ -138,7 +141,7 @@ export class ClientService {
                 SET
                 abonementid = ${dto.abonement_id},
                 paymentmethod = '${dto.purchase_paymentmethod}',
-                ispaid = false,
+                ispaid = ${dto.purchase_ispaid},
                 startdate = '${dto.purchase_startdate}',
                 enddate = '${dto.purchase_enddate}'
                 WHERE clientid = ${dto.client_id};
@@ -151,6 +154,22 @@ export class ClientService {
         catch (e) {
             console.log(e)
             throw 'Error update client info'
+        }
+    }
+
+    async create (dto: ClientUpdateDto) {
+        try {
+            const sql = `
+            INSERT INTO Clients (clientId, fio, dob, isMember, phone, mentorId)
+            VALUES (COALESCE((SELECT MAX(clientId) FROM Clients), 0) + 1, '${dto.client_fio}', CAST('${dto.client_dob}' AS DATE), false, '${dto.client_phone}', ${dto.mentor_id});
+            `
+            const [[result], _] = await db.query(sql);
+
+            return result;
+        }
+        catch (e) {
+            console.log(e)
+            throw 'Error create client'
         }
     }
   

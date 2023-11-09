@@ -8,7 +8,7 @@ class ClientController {
 
   getAllUsers = async (req: Request, res: Response, next: NextFunction) => {
     return await this.clientService
-      .getAllUsers(Number(req.query.page), Number(req.query.limit), req.query.search as string)
+      .getAllUsers(Number(req.query.page), Number(req.query.limit), req.query.search as string, req.query.sortmodel )
       .then(resp => res.json(resp))
       .catch(err => next(ApiError.badRequest(err)));
   };
@@ -23,6 +23,13 @@ class ClientController {
   update = async (req: Request, res: Response, next: NextFunction) => {
     return await this.clientService
       .update(req.body)
+      .then(resp => res.json(resp))
+      .catch(err => next(ApiError.badRequest(err)));
+  };
+
+  create = async (req: Request, res: Response, next: NextFunction) => {
+    return await this.clientService
+      .create(req.body)
       .then(resp => res.json(resp))
       .catch(err => next(ApiError.badRequest(err)));
   };

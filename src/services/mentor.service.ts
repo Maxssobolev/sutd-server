@@ -2,7 +2,10 @@ import db from '../db';
 
 export class MentorService {
 
-    async getAllMentors(page = 1, limit = 10, search = "") {
+    async getAllMentors(page = 1, limit = 10, search = "", order: any) {
+        const myOrder = JSON.parse(order)
+        const hasOrder = !!myOrder && myOrder?.sortModel?.at(0)
+    
         try {
 
             const [[rows], [[count]]] = await Promise.all([
@@ -12,7 +15,7 @@ export class MentorService {
                      fio as mentor_name,
                      mentorid as mentor_id
                  FROM Mentors
-                 WHERE fio LIKE '%${search}%'  
+                 WHERE fio ILIKE '%${search}%'  
                  )
                  SELECT
                     mentor_name,
@@ -20,7 +23,7 @@ export class MentorService {
                  FROM (
                      SELECT
                          *,
-                         ROW_NUMBER() OVER (ORDER BY mentor_id DESC) AS row_num
+                         ROW_NUMBER() OVER (ORDER BY ${hasOrder ? `${myOrder.sortModel?.at(0).field} ${myOrder.sortModel?.at(0).sort}` : 'mentor_id DESC'}) AS row_num
                      FROM Mentors
                  ) AS PaginatedData
                  WHERE row_num BETWEEN ${page} * ${limit} + 1 AND (${page} + 1) * ${limit}
@@ -31,7 +34,7 @@ export class MentorService {
                      fio as mentor_name,
                      mentorid as mentor_id
                     FROM Mentors
-                    WHERE fio LIKE '%${search}%'  
+                    WHERE fio ILIKE '%${search}%'  
                 )
                 SELECT COUNT(*) AS total_count
                 FROM Mentors;

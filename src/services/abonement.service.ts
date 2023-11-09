@@ -2,7 +2,9 @@ import db from '../db';
 
 export class AbonementService {
 
-    async getAll(page = 1, limit = 10, search = "") {
+    async getAll(page = 1, limit = 10, search = "", order: any) {
+        const myOrder = JSON.parse(order)
+        const hasOrder = !!myOrder && myOrder?.sortModel?.at(0)
         try {
 
             const [[rows], [[count]]] = await Promise.all([
@@ -15,7 +17,7 @@ export class AbonementService {
                     price as abonement_price,
                     duration as abonement_duration
                  FROM Abonements
-                 WHERE title LIKE '%${search}%'  
+                 WHERE title ILIKE '%${search}%'  
                  )
                  SELECT
                     abonement_id,
@@ -26,7 +28,7 @@ export class AbonementService {
                  FROM (
                      SELECT
                          *,
-                         ROW_NUMBER() OVER (ORDER BY abonement_id DESC) AS row_num
+                         ROW_NUMBER() OVER (ORDER BY ${hasOrder ? `${myOrder.sortModel?.at(0).field} ${myOrder.sortModel?.at(0).sort}` : 'abonement_id DESC'}) AS row_num
                      FROM Abonements
                  ) AS PaginatedData
                  WHERE row_num BETWEEN ${page} * ${limit} + 1 AND (${page} + 1) * ${limit}
@@ -37,7 +39,7 @@ export class AbonementService {
                      abonementId as abonement_id,
                      title as abonement_title
                     FROM Abonements
-                    WHERE title LIKE '%${search}%'  
+                    WHERE title ILIKE '%${search}%'  
                 )
                 SELECT COUNT(*) AS total_count
                 FROM Abonements;

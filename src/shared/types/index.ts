@@ -1,3 +1,8 @@
+export enum OrderStatus {
+    notStated = 'не обработана',
+    inProgress = 'в работе',
+    done = 'закрыта'
+}
 export interface ClientUpdateDto {
     abonement_description: string,
     abonement_duration: number,
@@ -16,4 +21,12 @@ export interface ClientUpdateDto {
     purchase_paymentmethod: string,
     purchase_startdate: string,
     purchase_abonement_id: number | null,
+}
+export interface OrderUpdateDto extends ClientUpdateDto{
+    order_client_id: number,
+    order_createdat: string,
+    order_id: number,
+    order_mentor_id: number,
+    order_notes: string,
+    order_status: OrderStatus,
 }
