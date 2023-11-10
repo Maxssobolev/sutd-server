@@ -15,7 +15,7 @@ export class MentorService {
                      fio as mentor_name,
                      mentorid as mentor_id
                  FROM Mentors
-                 WHERE fio LIKE '%${search}%'  
+                 WHERE fio ILIKE '%${search}%'  
                  )
                  SELECT
                     mentor_name,
@@ -34,7 +34,7 @@ export class MentorService {
                      fio as mentor_name,
                      mentorid as mentor_id
                     FROM Mentors
-                    WHERE fio LIKE '%${search}%'  
+                    WHERE fio ILIKE '%${search}%'  
                 )
                 SELECT COUNT(*) AS total_count
                 FROM Mentors;
