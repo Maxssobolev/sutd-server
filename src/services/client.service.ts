@@ -85,7 +85,7 @@ export class ClientService {
         try {
 
             
-           await db.query(`
+           const [[result], _] = await db.query(`
            SELECT 
                 Clients.clientId as client_id,
                 Clients.fio as client_fio,
@@ -116,7 +116,7 @@ export class ClientService {
                 Clients.clientid = ${id};
            `);
            
-           return true
+           return result
         }
         catch (e) {
             console.log(e)
@@ -147,9 +147,9 @@ export class ClientService {
                 WHERE clientid = ${dto.client_id};
             ` : ''
 
-            const [[result], _] = await db.query(sql + sql2);
+            await db.query(sql + sql2);
 
-            return result;
+            return true;
         }
         catch (e) {
             console.log(e)
@@ -163,9 +163,9 @@ export class ClientService {
             INSERT INTO Clients (clientId, fio, dob, isMember, phone, mentorId)
             VALUES (COALESCE((SELECT MAX(clientId) FROM Clients), 0) + 1, '${dto.client_fio}', CAST('${dto.client_dob}' AS DATE), false, '${dto.client_phone}', ${dto.mentor_id});
             `
-            await db.query(sql);
+            const [[result], _] = await db.query(sql);
 
-            return true;
+            return result;
         }
         catch (e) {
             console.log(e)
