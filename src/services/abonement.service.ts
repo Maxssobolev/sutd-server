@@ -17,7 +17,7 @@ export class AbonementService {
                     price as abonement_price,
                     duration as abonement_duration
                  FROM Abonements
-                 WHERE title ILIKE '%${search}%'  
+                 WHERE title LIKE '%${search}%'  
                  )
                  SELECT
                     abonement_id,
@@ -39,7 +39,7 @@ export class AbonementService {
                      abonementId as abonement_id,
                      title as abonement_title
                     FROM Abonements
-                    WHERE title ILIKE '%${search}%'  
+                    WHERE title LIKE '%${search}%'  
                 )
                 SELECT COUNT(*) AS total_count
                 FROM Abonements;

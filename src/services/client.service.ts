@@ -28,7 +28,7 @@ export class ClientService {
                  LEFT JOIN Orders o ON c.clientId = o.clientId
                  LEFT JOIN Purchases p ON c.clientId = p.clientId
                  LEFT JOIN Mentors m ON c.mentorId = m.mentorId
-                 WHERE c.fio ILIKE '%${search}%'  
+                 WHERE c.fio LIKE '%${search}%'  
                  GROUP BY c.clientId, c.fio, m.fio, p.abonementId, c.dob, c.phone
                  )
                  SELECT
@@ -63,7 +63,7 @@ export class ClientService {
                     LEFT JOIN Orders o ON c.clientId = o.clientId
                     LEFT JOIN Purchases p ON c.clientId = p.clientId
                     LEFT JOIN Mentors m ON c.mentorId = m.mentorId
-                    WHERE c.fio ILIKE '%${search}%'
+                    WHERE c.fio LIKE '%${search}%'
                     GROUP BY c.clientId, c.fio, m.fio, p.abonementId
                 )
                 SELECT COUNT(*) AS total_count

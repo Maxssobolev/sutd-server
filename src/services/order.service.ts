@@ -24,7 +24,7 @@ export class OrderService {
                  FROM Orders o
                  LEFT JOIN Clients c ON o.clientid = c.clientid
                  LEFT JOIN Mentors m ON o.mentorid = m.mentorid
-                 WHERE c.fio ILIKE '%${search}%'  
+                 WHERE c.fio LIKE '%${search}%'  
                  )
                  SELECT
                  order_client_id,
@@ -58,7 +58,7 @@ export class OrderService {
                     FROM Orders o
                     LEFT JOIN Clients c ON o.clientid = c.clientid
                     LEFT JOIN Mentors m ON o.mentorid = m.mentorid
-                    WHERE c.fio ILIKE '%${search}%'
+                    WHERE c.fio LIKE '%${search}%'
                     
                 )
                 SELECT COUNT(*) AS total_count
