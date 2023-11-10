@@ -21,6 +21,8 @@ export interface ClientUpdateDto {
     purchase_paymentmethod: string,
     purchase_startdate: string,
     purchase_abonement_id: number | null,
+    purchase_id: number | null,
+    purchase_client_id: number | null,
 }
 export interface OrderUpdateDto extends ClientUpdateDto{
     order_client_id: number,

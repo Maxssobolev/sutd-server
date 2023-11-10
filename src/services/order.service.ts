@@ -97,6 +97,8 @@ export class OrderService {
                 Purchases.paymentMethod as purchase_paymentmethod,
                 Purchases.isPaid as purchase_ispaid,
                 Purchases.abonementid as purchase_abonement_id,
+                Purchases.clientid as purchase_client_id,
+                Purchases.purchaseid as purchase_id,
                 Orders.clientid as order_client_id,
                 Orders.orderid AS order_id,
                 Orders.mentorid AS order_mentor_id,
@@ -138,18 +140,56 @@ export class OrderService {
                 orderid = ${dto.order_id};
             `
             
-            const sql2 = dto.abonement_id ?  `
+            const sql2 = dto.abonement_id && dto.purchase_id ?  `
                 UPDATE Purchases
                 SET
                 abonementid = ${dto.abonement_id},
                 paymentmethod = '${dto.purchase_paymentmethod}',
                 ispaid = ${dto.purchase_ispaid},
-                startdate = '${dto.purchase_startdate}',
-                enddate = '${dto.purchase_enddate}'
+                ${dto.purchase_ispaid ? `startdate = '${dto.purchase_startdate}'` : ''},
+                ${dto.purchase_ispaid ? `enddate = '${dto.purchase_enddate}'` : ''},
                 WHERE clientid = ${dto.client_id};
-            ` : ''
+            ` : '';
+
+            const sql3 = dto.abonement_id && !dto.purchase_id ? `
+                INSERT INTO Purchases (purchaseid, abonementid, clientid, ispaid, startdate, enddate, paymentmethod)
+                VALUES (COALESCE((SELECT MAX(purchaseid) FROM Purchases), 0) + 1, ${dto.abonement_id}, ${dto.client_id} , ${dto.purchase_ispaid || false}, ${dto.purchase_startdate ? `'${dto.purchase_startdate}'` : null}, ${dto.purchase_enddate ? `'${dto.purchase_enddate}'` : null}, 'card');
+            `: '';
                 
-            const [[result], _] = await db.query(sql + sql2);
+            const [[result], _] = await db.query(sql + sql2 + sql3);
+
+            return result;
+        }
+        catch (e) {
+            console.log(e)
+            throw 'Error update order info'
+        }
+    }
+
+    async create (dto: OrderUpdateDto) {
+        try {
+            const sql = `
+                INSERT INTO Orders (orderid, mentorid, clientid, notes, status, createdat)
+                VALUES (COALESCE((SELECT MAX(orderid) FROM Orders), 0) + 1, ${dto.mentor_id}, ${dto.client_id} , ${dto.order_notes ? `'${dto.order_notes}'` : null}, ${dto.order_status ? `'${dto.order_status}'` : 'не обработана'}, ${dto.order_createdat ? `'${dto.order_createdat}'` : null});
+            `
+            
+            const sql2 = dto.abonement_id && dto.purchase_id ?  `
+                UPDATE Purchases
+                SET
+                abonementid = ${dto.abonement_id},
+                paymentmethod = '${dto.purchase_paymentmethod}',
+                ispaid = ${dto.purchase_ispaid},
+                ${dto.purchase_ispaid ? `startdate = '${dto.purchase_startdate}'` : ''},
+                ${dto.purchase_ispaid ? `enddate = '${dto.purchase_enddate}'` : ''},
+                WHERE clientid = ${dto.client_id};
+            ` : '';
+
+            const sql3 = dto.abonement_id && !dto.purchase_id ? `
+                INSERT INTO Purchases (purchaseid, abonementid, clientid, ispaid, startdate, enddate, paymentmethod)
+                VALUES (COALESCE((SELECT MAX(purchaseid) FROM Purchases), 0) + 1, ${dto.abonement_id}, ${dto.client_id} , ${dto.purchase_ispaid || false}, ${dto.purchase_startdate ? `'${dto.purchase_startdate}'` : null}, ${dto.purchase_enddate ? `'${dto.purchase_enddate}'` : null}, 'card');
+            `: '';
+                
+            const [[result], _] = await db.query(sql + sql2 + sql3);
 
             return result;
         }

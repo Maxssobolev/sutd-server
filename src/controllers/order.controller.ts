@@ -27,6 +27,13 @@ class OrderController {
       .catch(err => next(ApiError.badRequest(err)));
   };
 
+  create = async (req: Request, res: Response, next: NextFunction) => {
+    return await this.orderService
+      .create(req.body)
+      .then(resp => res.json(resp))
+      .catch(err => next(ApiError.badRequest(err)));
+  };
+
   
 }
 
