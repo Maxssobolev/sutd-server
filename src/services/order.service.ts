@@ -137,18 +137,21 @@ export class OrderService {
                 WHERE 
                 orderid = ${dto.order_id};
             `
-            const sql2 = (dto.abonement_id) ? `
-                UPDATE Purchases
-                SET
-                abonementid = ${dto.abonement_id},
-                paymentmethod = '${dto.purchase_paymentmethod}',
-                ispaid = ${dto.purchase_ispaid},
-                startdate = '${dto.purchase_startdate}',
-                enddate = '${dto.purchase_enddate}'
-                WHERE clientid = ${dto.client_id};
-            ` : ''
+            await db.query(sql);
+            if(dto.abonement_id) {
+                const sql2 = `
+                    UPDATE Purchases
+                    SET
+                    abonementid = ${dto.abonement_id},
+                    paymentmethod = '${dto.purchase_paymentmethod}',
+                    ispaid = ${dto.purchase_ispaid},
+                    startdate = '${dto.purchase_startdate}',
+                    enddate = '${dto.purchase_enddate}'
+                    WHERE clientid = ${dto.client_id};
+                `
+                await db.query(sql2);
+            }
 
-            await db.query(sql + sql2);
 
             return true;
         }
