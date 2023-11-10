@@ -159,11 +159,11 @@ export class ClientService {
 
     async create (dto: ClientUpdateDto) {
         try {
-            const [[maxClientId], __] = await db.query(`SELECT COALESCE(MAX(clientid), 0) FROM Clients`);
-            console.log(maxClientId);
+            const [[maxClientId], __] = await db.query(`SELECT COALESCE(MAX(clientid), 0) FROM Clients`) as any;
+            
             const sql = `
             INSERT INTO Clients (clientId, fio, dob, isMember, phone, mentorId)
-            VALUES (${maxClientId} + 1, '${dto.client_fio}', CAST('${dto.client_dob}' AS DATE), false, '${dto.client_phone}', ${dto.mentor_id});
+            VALUES (${maxClientId['COALESCE(MAX(clientid), 0)']} + 1, '${dto.client_fio}', CAST('${dto.client_dob}' AS DATE), false, '${dto.client_phone}', ${dto.mentor_id});
             `
             await db.query(sql);
 
