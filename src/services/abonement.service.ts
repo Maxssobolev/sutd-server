@@ -60,7 +60,7 @@ export class AbonementService {
         try {
 
             
-           const [[result], _] = await db.query(`
+           await db.query(`
                  SELECT
                     abonementId as abonement_id,
                     title as abonement_title,
@@ -71,7 +71,7 @@ export class AbonementService {
                  WHERE abonementId = ${id}'  
            `);
            
-           return result
+           return true
         }
         catch (e) {
             console.log(e)

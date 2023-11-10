@@ -148,9 +148,9 @@ export class OrderService {
                 WHERE clientid = ${dto.client_id};
             ` : ''
 
-            const [[result], _] = await db.query(sql + sql2);
+            await db.query(sql + sql2);
 
-            return result;
+            return true;
         }
         catch (e) {
             console.log(e)
