@@ -136,7 +136,9 @@ export class ClientService {
                 WHERE 
                 clientid = ${dto.client_id};
             `
-            const sql2 = (dto.abonement_id && dto.abonement_id != dto.purchase_abonement_id) ? `
+            await db.query(sql);
+            if(dto.abonement_id) {
+                const sql2 = `
                 UPDATE Purchases
                 SET
                 abonementid = ${dto.abonement_id},
@@ -145,9 +147,13 @@ export class ClientService {
                 startdate = '${dto.purchase_startdate}',
                 enddate = '${dto.purchase_enddate}'
                 WHERE clientid = ${dto.client_id};
-            ` : ''
+                `;
+                await db.query(sql2);
 
-            await db.query(sql + sql2);
+            }
+            
+
+            
 
             return true;
         }
