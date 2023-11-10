@@ -135,10 +135,8 @@ export class ClientService {
                 mentorid = ${dto.mentor_id}
                 WHERE 
                 clientid = ${dto.client_id};
-            `
-            await db.query(sql);
-            if(dto.abonement_id) {
-                const sql2 = `
+            `;
+                const sql2 = dto.abonement_id ? `
                 UPDATE Purchases
                 SET
                 abonementid = ${dto.abonement_id},
@@ -147,15 +145,12 @@ export class ClientService {
                 startdate = '${dto.purchase_startdate}',
                 enddate = '${dto.purchase_enddate}'
                 WHERE clientid = ${dto.client_id};
-                `;
-                await db.query(sql2);
-
-            }
+                ` : '';
+              
             
+            const [[result], _] = await db.query(sql + sql2);
 
-            
-
-            return true;
+            return result;
         }
         catch (e) {
             console.log(e)
@@ -165,15 +160,14 @@ export class ClientService {
 
     async create (dto: ClientUpdateDto) {
         try {
-            const [[maxClientId], __] = await db.query(`SELECT COALESCE(MAX(clientid), 0) FROM Clients`) as any;
-            
+         
             const sql = `
             INSERT INTO Clients (clientId, fio, dob, isMember, phone, mentorId)
-            VALUES (${maxClientId['COALESCE(MAX(clientid), 0)']} + 1, '${dto.client_fio}', CAST('${dto.client_dob}' AS DATE), false, '${dto.client_phone}', ${dto.mentor_id});
+            VALUES (COALESCE((SELECT MAX(clientId) FROM Clients), 0) + 1, '${dto.client_fio}', CAST('${dto.client_dob}' AS DATE), false, '${dto.client_phone}', ${dto.mentor_id});
             `
-            await db.query(sql);
+            const [[result], _] = await db.query(sql);
 
-            return true;
+            return result;
         }
         catch (e) {
             console.log(e)
