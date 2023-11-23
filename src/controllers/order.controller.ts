@@ -20,6 +20,13 @@ class OrderController {
       .catch(err => next(ApiError.badRequest(err)));
   };
 
+  delete = async (req: Request, res: Response, next: NextFunction) => {
+    return await this.orderService
+      .delete(Number(req.params.id))
+      .then(resp => res.json(resp))
+      .catch(err => next(ApiError.badRequest(err)));
+  };
+
   update = async (req: Request, res: Response, next: NextFunction) => {
     return await this.orderService
       .update(req.body)
@@ -33,6 +40,7 @@ class OrderController {
       .then(resp => res.json(resp))
       .catch(err => next(ApiError.badRequest(err)));
   };
+  
 
   
 }

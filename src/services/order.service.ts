@@ -145,9 +145,9 @@ export class OrderService {
                 SET
                 abonementid = ${dto.abonement_id},
                 paymentmethod = '${dto.purchase_paymentmethod}',
-                ispaid = ${dto.purchase_ispaid},
-                ${dto.purchase_ispaid ? `startdate = '${dto.purchase_startdate}'` : ''},
-                ${dto.purchase_ispaid ? `enddate = '${dto.purchase_enddate}'` : ''},
+                ispaid = ${dto.purchase_ispaid}
+                ${dto.purchase_ispaid ? `, startdate = '${dto.purchase_startdate}',` : ''}
+                ${dto.purchase_ispaid ? `enddate = '${dto.purchase_enddate}'` : ''}
                 WHERE clientid = ${dto.client_id};
             ` : '';
 
@@ -197,6 +197,13 @@ export class OrderService {
             console.log(e)
             throw 'Error update order info'
         }
+    }
+
+    async delete (id: number) {
+        const sql = `DELETE FROM Orders WHERE clientid = ${id};`
+        const [[result], _] = await db.query(sql);
+
+        return result
     }
   
 }

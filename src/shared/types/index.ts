@@ -32,3 +32,11 @@ export interface OrderUpdateDto extends ClientUpdateDto{
     order_notes: string,
     order_status: OrderStatus,
 }
+
+export interface AbonementUpdateDto{
+    abonement_description: string,
+    abonement_duration: number,
+    abonement_id: number,
+    abonement_price: number,
+    abonement_title: string,
+}

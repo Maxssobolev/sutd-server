@@ -18,9 +18,12 @@ export class ClientService {
                      c.isMember as client_ismember,
                      c.dob as client_dob,
                      c.phone as client_phone,
+                     p.enddate as purchase_enddate,
+                     p.ispaid as purchase_ispaid,
                      MAX(o.createdat) AS last_order_date,
                      CASE
-                         WHEN p.abonementId IS NOT NULL THEN 'Есть абонемент'
+                         WHEN p.abonementid IS NOT NULL AND p.ispaid = true THEN 'Оплачен'
+                         WHEN p.abonementid IS NOT NULL AND (p.ispaid = false OR p.ispaid IS NULL) THEN 'Не оплачен'
                          ELSE 'Нет абонемента'
                      END AS abonement_status,
                      m.fio AS mentor_name
@@ -29,7 +32,7 @@ export class ClientService {
                  LEFT JOIN Purchases p ON c.clientId = p.clientId
                  LEFT JOIN Mentors m ON c.mentorId = m.mentorId
                  WHERE c.fio ILIKE '%${search}%'  
-                 GROUP BY c.clientId, c.fio, m.fio, p.abonementId, c.dob, c.phone
+                 GROUP BY c.clientId, c.fio, m.fio, p.abonementId, p.ispaid, p.enddate, c.dob, c.phone
                  )
                  SELECT
                     client_id,
@@ -37,6 +40,8 @@ export class ClientService {
                     client_ismember,
                     client_dob,
                     client_phone,
+                    purchase_enddate,
+                    purchase_ispaid,
                      last_order_date,
                      abonement_status,
                      mentor_name
@@ -173,6 +178,15 @@ export class ClientService {
             console.log(e)
             throw 'Error create client'
         }
+    }
+
+    async delete (id: number) {
+        const sql1 = `DELETE FROM Orders WHERE clientid = ${id};`
+        const sql2 = `DELETE FROM Purchases WHERE clientid = ${id};`
+        const sql3 = `DELETE FROM Clients WHERE clientid = ${id};`
+        const [[result], _] = await db.query(sql1 + sql2 + sql3);
+
+        return result
     }
   
 }
