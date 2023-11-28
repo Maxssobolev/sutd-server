@@ -20,9 +20,16 @@ class AbonementController {
       .catch(err => next(ApiError.badRequest(err)));
   };
 
-  stats = async (req: Request, res: Response, next: NextFunction) => {
+  amountCostsStat = async (req: Request, res: Response, next: NextFunction) => {
     return await this.abonementService
-      .stats()
+      .amountCostsStat()
+      .then(resp => res.json(resp))
+      .catch(err => next(ApiError.badRequest(err)));
+  };
+
+  commonStats = async (req: Request, res: Response, next: NextFunction) => {
+    return await this.abonementService
+      .commonStat()
       .then(resp => res.json(resp))
       .catch(err => next(ApiError.badRequest(err)));
   };

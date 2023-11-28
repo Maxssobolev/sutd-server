@@ -127,7 +127,7 @@ export class AbonementService {
         return result
     }
 
-    async stats () {
+    async amountCostsStat () {
         const sql = `
         SELECT
             A.title AS abonement_title,
@@ -145,6 +145,33 @@ export class AbonementService {
         const [result, _] = await db.query(sql);
 
         return result
+    }
+
+    async commonStat () {
+        
+        const sql = `
+            SELECT COUNT(*) AS clients_total_count
+            FROM Clients;
+            
+            SELECT
+                COUNT(P.purchaseId) AS purchases_total_count,
+                SUM(A.price) AS purchases_total_amount
+            FROM Purchases P
+            JOIN Abonements A ON P.abonementId = A.abonementId
+            WHERE P.isPaid = true;
+            
+            SELECT COUNT(*) AS orders_total_open_count
+            FROM Orders
+            WHERE status <> 'закрыта';
+        `
+        const [result, _] = await db.query(sql);
+        
+        return ({
+            clients_total_count: (result[0] as any).clients_total_count,
+            purchases_total_count: (result[1] as any).purchases_total_count,
+            purchases_total_amount: (result[1] as any).purchases_total_amount,
+            orders_total_open_count: (result[2] as any).orders_total_open_count,
+        })
     }
   
 }
